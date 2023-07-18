@@ -1,4 +1,4 @@
-package com.point.api.common.exception;
+package com.point.core.common.exception;
 
 import lombok.Getter;
 

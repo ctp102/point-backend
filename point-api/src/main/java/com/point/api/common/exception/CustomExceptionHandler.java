@@ -1,10 +1,10 @@
-package com.point.api.common.exception.handler;
+package com.point.api.common.exception;
 
-import com.point.api.common.exception.CustomAccessDeniedException;
-import com.point.api.common.exception.CustomBadRequestException;
-import com.point.api.common.exception.CustomNotFoundException;
-import com.point.api.common.exception.CustomUnauthorizedException;
 import com.point.core.common.enums.ErrorResponseCodes;
+import com.point.core.common.exception.CustomAccessDeniedException;
+import com.point.core.common.exception.CustomBadRequestException;
+import com.point.core.common.exception.CustomNotFoundException;
+import com.point.core.common.exception.CustomUnauthorizedException;
 import com.point.core.common.response.CustomResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import javax.servlet.http.HttpServletRequest;
 
 @Slf4j
-@RestControllerAdvice(basePackages = "com.point")
+@RestControllerAdvice(basePackages = "com.point.api")
 public class CustomExceptionHandler {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

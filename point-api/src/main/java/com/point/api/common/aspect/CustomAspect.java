@@ -1,4 +1,4 @@
-package com.point.api.aspect;
+package com.point.api.common.aspect;
 
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.annotation.Aspect;
