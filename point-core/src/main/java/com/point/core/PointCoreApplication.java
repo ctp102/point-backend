@@ -1,4 +1,4 @@
-package com.ctp102.point.core;
+package com.point.core;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
