@@ -1,13 +1,13 @@
-package com.ctp102.point;
+package com.ctp102.point.core;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class PointApplication {
+public class PointCoreApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(PointApplication.class, args);
+        SpringApplication.run(PointCoreApplication.class, args);
     }
 
 }

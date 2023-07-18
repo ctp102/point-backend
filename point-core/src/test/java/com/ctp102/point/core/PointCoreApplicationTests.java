@@ -1,10 +1,10 @@
-package com.ctp102.point;
+package com.ctp102.point.core;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class PointApplicationTests {
+class PointCoreApplicationTests {
 
     @Test
     void contextLoads() {
