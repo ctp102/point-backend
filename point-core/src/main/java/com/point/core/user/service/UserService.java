@@ -1,8 +1,10 @@
 package com.point.core.user.service;
 
-import org.springframework.stereotype.Service;
+import com.point.core.user.domain.User;
 
-@Service
-public class UserService {
+public interface UserService {
 
+    User findUser(Long userId);
+
+    User save(User user);
 }

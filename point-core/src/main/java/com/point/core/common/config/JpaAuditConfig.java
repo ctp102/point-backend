@@ -1,4 +1,4 @@
-package com.point.core.config;
+package com.point.core.common.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;

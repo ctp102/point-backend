@@ -22,7 +22,6 @@ public class CustomResponse {
     public static final class Builder {
 
         private final CustomResponseCodes responseCodes;
-        private final Map<String, Object> status;
         private final Map<String, Object> data;
 
         public Builder() {
@@ -30,7 +29,6 @@ public class CustomResponse {
         }
 
         public Builder(CustomResponseCodes responseCodes) {
-            this.status = new LinkedHashMap<>();
             this.data = new LinkedHashMap<>();
             this.responseCodes = responseCodes;
         }
@@ -51,26 +49,22 @@ public class CustomResponse {
             return this;
         }
 
-        public Builder addData(String key1, Object value1) {
-            this.data.put(key1, value1);
+        public Builder addData(String k1, Object v1) {
+            this.data.put(k1, v1);
             return this;
         }
 
-        public Builder addData(String key1, Object value1, String key2, Object value2) {
-            this.data.put(key1, value1);
-            this.data.put(key2, value2);
+        public Builder addData(String k1, Object v1, String k2, Object v2) {
+            this.data.put(k1, v1);
+            this.data.put(k2, v2);
             return this;
         }
 
-        public Builder addData(String key1, Object value1, String key2, Object value2, String key3, Object value3) {
-            this.data.put(key1, value1);
-            this.data.put(key2, value2);
-            this.data.put(key3, value3);
+        public Builder addData(String k1, Object v1, String k2, Object v2, String k3, Object v3) {
+            this.data.put(k1, v1);
+            this.data.put(k2, v2);
+            this.data.put(k3, v3);
             return this;
-        }
-
-        public Builder addResultCodes(CustomResponseCodes customResponseCodes) {
-            return Objects.nonNull(customResponseCodes) ? this.addData("resultType", customResponseCodes.getClass().getSimpleName()) : this;
         }
 
         public CustomResponse build() {

@@ -7,7 +7,9 @@ import java.util.Arrays;
 
 public enum ErrorResponseCodes implements CustomResponseCodes {
 
-    NOT_ENOUGH_POINT(403, "잔여 포인트가 부족합니다.")
+    NOT_ENOUGH_POINT            (403, "차감할 포인트가 부족합니다."),
+
+    USER_NOT_FOUND            (404, "사용자를 찾을 수 없습니다."),
     ;
 
     @Getter
