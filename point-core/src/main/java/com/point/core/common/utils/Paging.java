@@ -1,6 +1,5 @@
 package com.point.core.common.utils;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.domain.Page;
@@ -8,8 +7,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 @Data
-@AllArgsConstructor
-@Builder
 public class Paging {
 
     private int pageNo;         // 현재 페이지 번호
@@ -19,10 +16,22 @@ public class Paging {
     private Sort sort;          // 정렬 정보
 
     public Pageable toPageable() {
-        return Pageable.ofSize(pageSize).withPage(pageNo >= 1 ? pageNo - 1 : 0);
+        return Pageable
+                .ofSize(pageSize)
+                .withPage(pageNo >= 1 ? pageNo - 1 : 0);
     }
 
-    public static Paging from(Page<?> page) {
+    @Builder
+    public Paging(int pageNo, int pageSize, long totalElements, long totalPage, Sort sort) {
+        this.pageNo = pageNo;
+        this.pageSize = pageSize;
+        this.totalElements = totalElements;
+        this.totalPage = totalPage;
+        this.sort = sort;
+    }
+
+
+    public static Paging of(Page<?> page) {
         return builder()
                 .pageNo(page.getPageable().getPageNumber() + 1)
                 .pageSize(page.getPageable().getPageSize())

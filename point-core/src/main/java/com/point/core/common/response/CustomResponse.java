@@ -45,7 +45,7 @@ public class CustomResponse {
 
         public Builder addItems(Page<?> items) {
             this.data.put("items", Objects.nonNull(items) ? items.getContent() : new ArrayList<>());
-            this.data.put("paging", Objects.nonNull(items) ? Paging.from(items) : null);
+            this.data.put("paging", Objects.nonNull(items) ? Paging.of(items) : null);
             return this;
         }
 

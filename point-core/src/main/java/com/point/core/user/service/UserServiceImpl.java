@@ -19,8 +19,8 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
-    @Override
     @Transactional(readOnly = true)
+    @Override
     public User findUser(Long userId) {
         User user = userRepository.findById(userId).orElse(null);
 
@@ -31,6 +31,7 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
+    @Transactional
     @Override
     public User save(User user) {
         return userRepository.save(user);

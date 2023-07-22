@@ -37,7 +37,7 @@ public class EarnPoint extends BaseTimeEntity {
     @Column(name = "EXPIRATION_YN", nullable = false)
     private String expirationYn;
 
-    @Comment("포인트 만료일(1년)")
+    @Comment("포인트 유효 기간(1년)")
     @Column(name = "EXPIRED_DATE", nullable = false)
     private LocalDateTime expiredDate;
 
