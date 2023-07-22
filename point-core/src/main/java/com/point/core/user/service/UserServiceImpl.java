@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.Objects;
 
 import static com.point.core.common.enums.ErrorResponseCodes.USER_NOT_FOUND;
@@ -19,10 +21,15 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
     @Transactional(readOnly = true)
     @Override
     public User findUser(Long userId) {
         User user = userRepository.findById(userId).orElse(null);
+
+        log.info("entityManager.contains(user) = {}", entityManager.contains(user));
 
         if (Objects.isNull(user)) {
             log.error("[findUser] 사용자를 찾을 수 없습니다. userId: {}", userId);

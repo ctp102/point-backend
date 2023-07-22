@@ -14,6 +14,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * The type User point rest controller.
+ */
 @RequiredArgsConstructor
 @Slf4j
 @RestController
@@ -37,8 +40,9 @@ public class UserPointRestController {
     /**
      * 회원별 포인트 적립/사용 내역 조회
      *
-     * @param userId   the user id
-     * @param pageable the pageable
+     * @param userId           the user id
+     * @param pointHistoryForm the point history form
+     * @param pageable         the pageable
      * @return user point history
      */
     @GetMapping("/points/history")
@@ -50,26 +54,26 @@ public class UserPointRestController {
     /**
      * 회원별 포인트 적립
      *
-     * @param userId           the user id
-     * @param earnPointRequest the earn point request
+     * @param userId  the user id
+     * @param request the request
      * @return custom response
      */
     @PostMapping("/points/earn")
-    public CustomResponse earnPoint(@PathVariable("userId") final Long userId, @RequestBody final EarnPointRequest earnPointRequest) {
-        pointFacade.earnPoint(userId, earnPointRequest);
+    public CustomResponse earnPoint(@PathVariable("userId") final Long userId, @RequestBody final EarnPointRequest request) {
+        pointFacade.earnPoint(userId, request);
         return new CustomResponse.Builder().build();
     }
 
     /**
      * 회원별 포인트 차감
      *
-     * @param userId             the user id
-     * @param deductPointRequest the deduct point request
+     * @param userId  the user id
+     * @param request the deduct point request
      * @return custom response
      */
     @PostMapping("/points/deduct")
-    public CustomResponse deductPoint(@PathVariable("userId") final Long userId, @RequestBody final DeductPointRequest deductPointRequest) {
-//        pointFacade.deductPoint(userId, deductPointRequest);
+    public CustomResponse deductPoint(@PathVariable("userId") final Long userId, @RequestBody final DeductPointRequest request) {
+        pointFacade.deductPoint(userId, request);
         return new CustomResponse.Builder().build();
     }
 
