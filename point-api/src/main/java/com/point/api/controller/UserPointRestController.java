@@ -2,6 +2,7 @@ package com.point.api.controller;
 
 import com.point.core.common.facade.PointFacade;
 import com.point.core.common.response.CustomResponse;
+import com.point.core.deduct.dto.CancelDeductPointRequest;
 import com.point.core.deduct.dto.DeductPointRequest;
 import com.point.core.earn.dto.EarnPointRequest;
 import com.point.core.history.dto.PointHistoryDto;
@@ -46,7 +47,7 @@ public class UserPointRestController {
      * @return user point history
      */
     @GetMapping("/points/history")
-    public CustomResponse getPointHistoryList(@PathVariable("userId") final Long userId, PointHistoryForm pointHistoryForm, @PageableDefault Pageable pageable) {
+    public CustomResponse getPointHistoryList(@PathVariable("userId") final Long userId, final PointHistoryForm pointHistoryForm, @PageableDefault Pageable pageable) {
         Page<PointHistoryDto> items = pointFacade.findPointHistoryList(userId, pointHistoryForm, pageable);
         return new CustomResponse.Builder().addItems(items).build();
     }
@@ -78,13 +79,14 @@ public class UserPointRestController {
     }
 
     /**
-     * 회원별 포인트 차감 취소
+     * 회원별 포인트 차감 취소(사용한 포인트 복구)
      *
      * @param userId the user id
      * @return custom response
      */
     @PostMapping("/points/cancel-deduct")
-    public CustomResponse cancelDeductPoint(@PathVariable("userId") final Long userId) {
+    public CustomResponse cancelDeductPoint(@PathVariable("userId") final Long userId, @RequestBody final CancelDeductPointRequest request) {
+        pointFacade.cancelDeductPoint(userId, request);
         return new CustomResponse.Builder().build();
     }
 

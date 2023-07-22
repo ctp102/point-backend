@@ -19,6 +19,15 @@ public interface EarnPointRepository extends JpaRepository<EarnPoint, Long> {
             @Param("userId") Long userId
     );
 
+    @Query("SELECT ep FROM EarnPoint ep " +
+            "WHERE ep.user.userId = :userId " +
+            "AND ep.expirationYn = 'N' " +
+            "AND ep.remainPoint = 0 " +
+            "ORDER BY ep.earnPointId ASC")
+    List<EarnPoint> findRestorableEarnPointList(
+            @Param("userId") Long userId
+    );
+
     @Modifying(clearAutomatically = true)
     @Query("UPDATE EarnPoint ep " +
             "SET ep.expirationYn = 'Y' " +
@@ -27,14 +36,22 @@ public interface EarnPointRepository extends JpaRepository<EarnPoint, Long> {
             @Param("earnPointId") Long earnPointId
     );
 
-//    @Transactional
     @Modifying
     @Query("UPDATE EarnPoint ep " +
             "SET ep.remainPoint = (ep.remainPoint - :tempDeductPoint) " +
             "WHERE ep.earnPointId = :earnPointId")
-    void updateRemainPoint(
+    void updateRemainPointForDeduct(
             @Param("earnPointId") Long earnPointId,
             @Param("tempDeductPoint") long tempDeductPoint
+    );
+
+    @Modifying
+    @Query("UPDATE EarnPoint ep " +
+            "SET ep.remainPoint = :restorePoint " +
+            "WHERE ep.earnPointId = :earnPointId")
+    void updateRemainPointForRestoration(
+            @Param("earnPointId") Long earnPointId,
+            @Param("restorePoint") Long restorePoint
     );
 
 }

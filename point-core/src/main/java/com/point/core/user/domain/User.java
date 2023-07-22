@@ -61,7 +61,17 @@ public class User extends BaseTimeEntity {
 
     public void addEarnPoint(EarnPoint earnPoint) {
         this.earnPoints.add(earnPoint);
-        earnPoint.setUser(this);
+        earnPoint.addUser(this);
+    }
+
+    public void addDeductPoint(DeductPoint deductPoint) {
+        this.deductPoints.add(deductPoint);
+        deductPoint.addUser(this);
+    }
+
+    public void addPointHistory(PointHistory pointHistory) {
+        this.pointHistories.add(pointHistory);
+        pointHistory.addUser(this);
     }
 
     @Builder

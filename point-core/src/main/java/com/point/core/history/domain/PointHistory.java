@@ -47,4 +47,8 @@ public class PointHistory extends BaseTimeEntity {
                 .build();
     }
 
+    public void addUser(User user) {
+        this.user = user;
+    }
+
 }

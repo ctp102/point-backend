@@ -34,7 +34,7 @@ public class PointHistoryServiceImpl implements PointHistoryService {
 
     private List<DomainCodes> getPointActionTypes(DomainCodes pointActionType) {
         if (Objects.isNull(pointActionType)) {
-            return List.of(DomainCodes.POINT_EARN, DomainCodes.POINT_DEDUCT, DomainCodes.POINT_DEDUCT_CANCEL, DomainCodes.POINT_EXPIRATION);
+            return List.of(DomainCodes.POINT_EARN, DomainCodes.POINT_DEDUCT, DomainCodes.POINT_DEDUCT_CANCEL);
         }
         return List.of(pointActionType);
     }

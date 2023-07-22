@@ -63,7 +63,7 @@ public class EarnPoint extends BaseTimeEntity {
                 .build();
     }
 
-    public void setUser(User user) {
+    public void addUser(User user) {
         this.user = user;
     }
 

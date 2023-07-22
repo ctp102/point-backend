@@ -19,17 +19,18 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DeductPointServiceImpl implements DeductPointService {
 
-//    private final EarnPointService earnPointService;
     private final UserRepository userRepository;
     private final EarnPointRepository earnPointRepository;
     private final DeductPointRepository deductPointRepository;
     private final PointHistoryRepository pointHistoryRepository;
     private final DeductPointValidator deductPointValidator;
 
+    /**
+     * 포인트 차감
+     */
     @Transactional
     @Override
     public DeductPoint deduct(DeductPoint deductPoint) {
-
         List<EarnPoint> availableEarnPoints = earnPointRepository.findAvailableEarnPoints(deductPoint.getUser().getUserId());
 
         Long tempDeductPoint = deductPoint.getDeductPoint();
@@ -43,10 +44,30 @@ public class DeductPointServiceImpl implements DeductPointService {
                 handleExpiredEarnPoint(earnPoint);
                 continue;
             }
-            tempDeductPoint = handleAvailablePoint(earnPoint, tempDeductPoint);
+            tempDeductPoint = handleAvailableEarnPoint(earnPoint, tempDeductPoint);
         }
 
         return deductPointRepository.save(deductPoint);
+    }
+
+    /**
+     * 포인트 차감 취소
+     */
+    @Transactional
+    @Override
+    public void cancelDeduct(Long userId, Long cancelPoint) {
+
+        // 포인트 복구 가능한 earnPointList 조회
+        List<EarnPoint> restorableEarnPointList = earnPointRepository.findRestorableEarnPointList(userId);
+
+        Long tempRestorePoint = cancelPoint;
+        for (EarnPoint earnPoint : restorableEarnPointList) {
+            if (tempRestorePoint == 0) {
+                break;
+            }
+
+            tempRestorePoint = handleRestorableEarnPoint(earnPoint, tempRestorePoint);
+        }
     }
 
     private void handleExpiredEarnPoint(EarnPoint earnPoint) {
@@ -54,15 +75,44 @@ public class DeductPointServiceImpl implements DeductPointService {
         earnPointRepository.updateExpirationYn(earnPoint.getEarnPointId());
     }
 
-    private Long handleAvailablePoint(EarnPoint earnPoint, Long tempDeductPoint) {
+    private Long handleAvailableEarnPoint(EarnPoint earnPoint, Long tempDeductPoint) {
+
         if (tempDeductPoint >= earnPoint.getRemainPoint()) {
             PointHistory pointHistory = PointHistory.of(earnPoint.getUser(), earnPoint.getRemainPoint(), DomainCodes.POINT_DEDUCT);
+            earnPoint.getUser().addPointHistory(pointHistory);
+
             pointHistoryRepository.save(pointHistory);
+
             return tempDeductPoint - earnPoint.getRemainPoint();
         } else {
             PointHistory pointHistory = PointHistory.of(earnPoint.getUser(), tempDeductPoint, DomainCodes.POINT_DEDUCT);
+            earnPoint.getUser().addPointHistory(pointHistory);
+
             pointHistoryRepository.save(pointHistory);
-            earnPointRepository.updateRemainPoint(earnPoint.getEarnPointId(), tempDeductPoint);
+            earnPointRepository.updateRemainPointForDeduct(earnPoint.getEarnPointId(), tempDeductPoint);
+            return 0L;
+        }
+    }
+
+    private Long handleRestorableEarnPoint(EarnPoint earnPoint, Long tempRestorePoint) {
+
+        Long restorePoint = earnPoint.getSavePoint();
+
+        if (tempRestorePoint >= restorePoint) {
+            PointHistory pointHistory = PointHistory.of(earnPoint.getUser(), restorePoint, DomainCodes.POINT_DEDUCT_CANCEL);
+            earnPoint.getUser().addPointHistory(pointHistory);
+
+            pointHistoryRepository.save(pointHistory);
+            earnPointRepository.updateRemainPointForRestoration(earnPoint.getEarnPointId(), restorePoint);
+
+            return tempRestorePoint - restorePoint;
+        } else {
+            PointHistory pointHistory = PointHistory.of(earnPoint.getUser(), tempRestorePoint, DomainCodes.POINT_DEDUCT_CANCEL);
+            earnPoint.getUser().addPointHistory(pointHistory);
+
+            pointHistoryRepository.save(pointHistory);
+            earnPointRepository.updateRemainPointForRestoration(earnPoint.getEarnPointId(), restorePoint - tempRestorePoint);
+
             return 0L;
         }
     }

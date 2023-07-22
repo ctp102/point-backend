@@ -6,4 +6,6 @@ public interface DeductPointService {
 
     DeductPoint deduct(DeductPoint deductPoint);
 
+    void cancelDeduct(Long userId, Long cancelPoint);
+
 }

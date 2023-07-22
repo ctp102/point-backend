@@ -3,15 +3,13 @@ package com.point.core.deduct.dto;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class DeductPointRequest {
+public class CancelDeductPointRequest {
 
-    private Long deductPoint;
-
-    public DeductPointRequest(Long deductPoint) {
-        this.deductPoint = deductPoint;
-    }
+    private Long cancelPoint;
 
 }

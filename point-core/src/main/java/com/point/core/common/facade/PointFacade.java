@@ -2,6 +2,7 @@ package com.point.core.common.facade;
 
 import com.point.core.common.enums.DomainCodes;
 import com.point.core.deduct.domain.DeductPoint;
+import com.point.core.deduct.dto.CancelDeductPointRequest;
 import com.point.core.deduct.dto.DeductPointRequest;
 import com.point.core.deduct.service.DeductPointService;
 import com.point.core.deduct.validator.DeductPointValidator;
@@ -23,8 +24,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.List;
 
 @Slf4j
@@ -38,9 +37,6 @@ public class PointFacade {
     private final PointHistoryService pointHistoryService;
     private final DeductPointValidator deductPointValidator;
 
-    @PersistenceContext
-    private EntityManager entityManager;
-
     @Transactional(readOnly = true)
     public UserDto findUser(Long userId) {
         User foundUser = userService.findUser(userId);
@@ -50,6 +46,7 @@ public class PointFacade {
     @Transactional(readOnly = true)
     public Page<PointHistoryDto> findPointHistoryList(Long userId, PointHistoryForm pointHistoryForm, Pageable pageable) {
         Page<PointHistory> result = pointHistoryService.findPointHistoryList(userId, pointHistoryForm, pageable);
+
         List<PointHistoryDto> pointHistoryDtoList = result.getContent().stream()
                 .map(PointHistoryDto::of)
                 .toList();
@@ -64,10 +61,12 @@ public class PointFacade {
         User foundUser = userService.findUser(userId);
 
         EarnPoint earnPoint = EarnPoint.of(foundUser, request.getSavePoint());
+        foundUser.addEarnPoint(earnPoint);
         EarnPoint savedEarnPoint = earnPointService.earn(earnPoint);
 
         // 2. 포인트 적립 내역 저장
         PointHistory pointHistory = PointHistory.of(foundUser, request.getSavePoint(), DomainCodes.POINT_EARN);
+        foundUser.addPointHistory(pointHistory);
         pointHistoryService.save(pointHistory);
 
         // 3. 사용자 보유 포인트 갱신
@@ -83,11 +82,11 @@ public class PointFacade {
         User foundUser = userService.findUser(userId);
         deductPointValidator.validate(foundUser.getRemainPoint(), request.getDeductPoint());
 
-        // 2. 포인트 차감 및 내역 저
+        // 2. 포인트 차감 및 내역 저장
         DeductPoint deductPoint = DeductPoint.of(foundUser, request.getDeductPoint());
+        foundUser.addDeductPoint(deductPoint);
 
-        // 여기서 foundUser가 영속성 컨텍스트 false. 왜? 내부에서 업데이트치고 바로 영속성 컨텍스트를 비우기 때문인데.. 왜 deductPoint는 살아 있지?
-        // 블로그 남길만 함
+        // 여기서 foundUser가 영속성 컨텍스트 false. 왜? 내부에서 업데이트치고 바로 영속성 컨텍스트를 비우기 때문인데.. 왜 deductPoint는 살아 있지? Modify 옵션 제거로 해결
         DeductPoint savedDeductPoint = deductPointService.deduct(deductPoint);
 
         // 3. 사용자 보유 포인트 갱신
@@ -96,4 +95,14 @@ public class PointFacade {
         return savedDeductPoint;
     }
 
+    @Transactional
+    public void cancelDeductPoint(Long userId, CancelDeductPointRequest request) {
+
+        // 1. 포인트 차감 취소 및 내역 저장
+        deductPointService.cancelDeduct(userId, request.getCancelPoint());
+
+        // 2. 사용자 보유 포인트 갱신
+        User foundUser = userService.findUser(userId);
+        foundUser.increase(request.getCancelPoint());
+    }
 }
