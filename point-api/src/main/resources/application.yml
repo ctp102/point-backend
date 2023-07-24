@@ -35,6 +35,17 @@ redisson:
     wait-time: 5000
     lease-time: 2000
 
+springdoc:
+  packages-to-scan: com.point.api.controller
+  default-consumes-media-type: application/json;charset=UTF-8
+  default-produces-media-type: application/json;charset=UTF-8
+  swagger-ui:
+    path: /
+    disable-swagger-default-url: true
+    display-request-duration: true
+    operations-sorter: method
+  override-with-generic-response: false
+
 logging:
   level:
     org.hibernate.SQL: debug
