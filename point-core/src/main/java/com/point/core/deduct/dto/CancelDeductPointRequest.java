@@ -12,4 +12,8 @@ public class CancelDeductPointRequest {
 
     private Long cancelPoint;
 
+    public CancelDeductPointRequest(Long cancelPoint) {
+        this.cancelPoint = cancelPoint;
+    }
+
 }

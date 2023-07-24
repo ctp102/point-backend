@@ -1,7 +1,6 @@
 package com.point.core.user.domain;
 
 import com.point.core.common.domain.BaseTimeEntity;
-import com.point.core.common.enums.ErrorResponseCodes;
 import com.point.core.common.exception.CustomAccessDeniedException;
 import com.point.core.deduct.domain.DeductPoint;
 import com.point.core.earn.domain.EarnPoint;
@@ -10,12 +9,13 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Comment;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.point.core.common.enums.ErrorResponseCodes.NOT_ENOUGH_POINT;
 
 @Entity
 @Table(name = "USERS")
@@ -34,17 +34,14 @@ public class User extends BaseTimeEntity {
     private Long remainPoint;
 
     @Comment("획득 포인트 목록")
-    @BatchSize(size = 1000)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EarnPoint> earnPoints = new ArrayList<>();
 
     @Comment("차감 포인트 목록")
-    @BatchSize(size = 1000)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DeductPoint> deductPoints = new ArrayList<>();
 
     @Comment("포인트 획득/차감 내역")
-    @BatchSize(size = 1000)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PointHistory> pointHistories = new ArrayList<>();
 
@@ -54,7 +51,7 @@ public class User extends BaseTimeEntity {
 
     public void decrease(final Long point) {
         if (this.remainPoint < point) {
-            throw new CustomAccessDeniedException(ErrorResponseCodes.NOT_ENOUGH_POINT.getNumber(), ErrorResponseCodes.NOT_ENOUGH_POINT.getMessage());
+            throw new CustomAccessDeniedException(NOT_ENOUGH_POINT.getNumber(), NOT_ENOUGH_POINT.getMessage());
         }
         this.remainPoint -= point;
     }

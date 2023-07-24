@@ -86,7 +86,6 @@ public class PointFacade {
         DeductPoint deductPoint = DeductPoint.of(foundUser, request.getDeductPoint());
         foundUser.addDeductPoint(deductPoint);
 
-        // 여기서 foundUser가 영속성 컨텍스트 false. 왜? 내부에서 업데이트치고 바로 영속성 컨텍스트를 비우기 때문인데.. 왜 deductPoint는 살아 있지? Modify 옵션 제거로 해결
         DeductPoint savedDeductPoint = deductPointService.deduct(deductPoint);
 
         // 3. 사용자 보유 포인트 갱신
