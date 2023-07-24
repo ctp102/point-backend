@@ -1,10 +1,7 @@
 package com.point.api.common.exception;
 
 import com.point.core.common.enums.ErrorResponseCodes;
-import com.point.core.common.exception.CustomAccessDeniedException;
-import com.point.core.common.exception.CustomBadRequestException;
-import com.point.core.common.exception.CustomNotFoundException;
-import com.point.core.common.exception.CustomUnauthorizedException;
+import com.point.core.common.exception.*;
 import com.point.core.common.response.CustomResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -46,21 +43,23 @@ public class CustomExceptionHandler {
         return getCustomResponse(e);
     }
 
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(CustomConflictException.class)
+    public CustomResponse conflictException(HttpServletRequest request, CustomConflictException e) {
+        log.error("[conflictException 발생] Request URI: {}", request.getRequestURI(), e);
+        return getCustomResponse(e);
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(CustomException.class)
+    public CustomResponse exception(HttpServletRequest request, CustomException e) {
+        log.error("[Exception 발생] Request URI: {}", request.getRequestURI(), e);
+        return new CustomResponse.Builder(ErrorResponseCodes.INTERNAL_SERVER_ERROR).build();
+    }
+
     private CustomResponse getCustomResponse(Exception e) {
         ErrorResponseCodes errorCodes = ErrorResponseCodes.findByMessage(e.getMessage());
         return new CustomResponse.Builder(errorCodes).build();
     }
-
-    // 아래를 주석해제하면 Exception 하위의 예외가 발생 시 아래 메서드가 실행된다....
-//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-//    @ExceptionHandler(Exception.class)
-//    public CustomResponse exception(HttpServletRequest request, Exception e) {
-//        log.error("[Exception 발생] Request URI: {}", request.getRequestURI(), e);
-//        return getCustomResponse(e);
-//    }
-
-//    private static CustomResponse getCustomResponse(Exception e) {
-//        return new CustomResponse.Builder(CustomCommonResponseCodes.INTERNAL_SERVER_ERROR).build();
-//    }
 
 }

@@ -1,6 +1,7 @@
 package com.point.core.earn.domain;
 
 import com.point.core.common.domain.BaseTimeEntity;
+import com.point.core.common.enums.DomainCodes;
 import com.point.core.user.domain.User;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -35,6 +36,11 @@ public class EarnPoint extends BaseTimeEntity {
     @Column(name = "REMAIN_POINT", nullable = false)
     private Long remainPoint;
 
+    @Comment("포인트 차감 상태")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "POINT_DEDUCT_STATUS", nullable = false)
+    private DomainCodes pointDeductStatus;
+
     @Comment("만료 여부")
     @ColumnDefault("'N'")
     @Column(name = "EXPIRATION_YN", nullable = false)
@@ -45,10 +51,11 @@ public class EarnPoint extends BaseTimeEntity {
     private LocalDateTime expiredDate;
 
     @Builder
-    public EarnPoint(User user, Long savePoint, Long remainPoint, String expirationYn, LocalDateTime expiredDate) {
+    public EarnPoint(User user, Long savePoint, Long remainPoint, DomainCodes pointDeductStatus, String expirationYn, LocalDateTime expiredDate) {
         this.user = user;
         this.savePoint = savePoint;
         this.remainPoint = remainPoint;
+        this.pointDeductStatus = pointDeductStatus;
         this.expirationYn = expirationYn;
         this.expiredDate = expiredDate;
     }
@@ -58,6 +65,7 @@ public class EarnPoint extends BaseTimeEntity {
                 .user(user)
                 .savePoint(savePoint)
                 .remainPoint(savePoint) // 처음에는 획득 포인트와 잔여 포인트가 동일하다.
+                .pointDeductStatus(DomainCodes.POINT_DEDUCT_ST_AVAILABLE)
                 .expirationYn("N")
                 .expiredDate(LocalDateTime.now().plusYears(1))
                 .build();

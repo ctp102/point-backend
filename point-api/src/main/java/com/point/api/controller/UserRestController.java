@@ -6,6 +6,7 @@ import com.point.core.earn.dto.EarnPointRequest;
 import com.point.core.user.domain.User;
 import com.point.core.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,6 +30,12 @@ public class UserRestController {
         pointFacade.earnPoint(savedUser.getUserId(), request);
 
         return new CustomResponse.Builder().build();
+    }
+
+    @GetMapping("/test")
+    public CustomResponse test() {
+        throw new RuntimeException("잔여 포인트가 부족합니다.");
+//        throw new CustomAccessDeniedException(ErrorResponseCodes.NOT_ENOUGH_POINT.getNumber(), ErrorResponseCodes.NOT_ENOUGH_POINT.getMessage());
     }
 
 }

@@ -1,6 +1,7 @@
 package com.point.api.controller;
 
 import com.point.core.common.facade.PointFacade;
+import com.point.core.common.facade.PointRedissonFacade;
 import com.point.core.common.response.CustomResponse;
 import com.point.core.deduct.dto.CancelDeductPointRequest;
 import com.point.core.deduct.dto.DeductPointRequest;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserPointRestController {
 
     private final PointFacade pointFacade;
+    private final PointRedissonFacade pointRedissonFacade;
 
     /**
      * 회원별 잔여 포인트 조회
@@ -61,7 +63,7 @@ public class UserPointRestController {
      */
     @PostMapping("/points/earn")
     public CustomResponse earnPoint(@PathVariable("userId") final Long userId, @RequestBody final EarnPointRequest request) {
-        pointFacade.earnPoint(userId, request);
+        pointRedissonFacade.earnPoint(userId, request);
         return new CustomResponse.Builder().build();
     }
 
@@ -74,7 +76,7 @@ public class UserPointRestController {
      */
     @PostMapping("/points/deduct")
     public CustomResponse deductPoint(@PathVariable("userId") final Long userId, @RequestBody final DeductPointRequest request) {
-        pointFacade.deductPoint(userId, request);
+        pointRedissonFacade.deductPoint(userId, request);
         return new CustomResponse.Builder().build();
     }
 
@@ -86,7 +88,7 @@ public class UserPointRestController {
      */
     @PostMapping("/points/cancel-deduct")
     public CustomResponse cancelDeductPoint(@PathVariable("userId") final Long userId, @RequestBody final CancelDeductPointRequest request) {
-        pointFacade.cancelDeductPoint(userId, request);
+        pointRedissonFacade.cancelDeductPoint(userId, request);
         return new CustomResponse.Builder().build();
     }
 

@@ -16,6 +16,7 @@ public class DeductPointValidator {
 
     public void validate(Long remainPoint, Long deductPoint) {
         if (remainPoint < deductPoint) {
+            log.error("[deductPoint] 잔여 포인트가 부족합니다. 잔여 포인트 = {}, 차감 시도 포인트 = {}", remainPoint, deductPoint);
             throw new CustomAccessDeniedException(NOT_ENOUGH_POINT.getNumber(), NOT_ENOUGH_POINT.getMessage());
         }
     }

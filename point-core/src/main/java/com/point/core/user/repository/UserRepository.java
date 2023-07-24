@@ -12,7 +12,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("UPDATE User u " +
             "SET u.remainPoint = (u.remainPoint - :earnRemainPoint) " +
             "WHERE u.userId = :userId")
-    void updateRemainPoint(
+    void updateRemainPointForExpiration(
             @Param("userId") Long userId,
             @Param("earnRemainPoint") Long earnRemainPoint
     );

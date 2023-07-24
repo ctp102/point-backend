@@ -1,6 +1,7 @@
 package com.point.core.deduct.service;
 
 import com.point.core.common.enums.DomainCodes;
+import com.point.core.common.exception.CustomAccessDeniedException;
 import com.point.core.deduct.domain.DeductPoint;
 import com.point.core.deduct.repository.DeductPointRepository;
 import com.point.core.deduct.validator.DeductPointValidator;
@@ -15,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static com.point.core.common.enums.ErrorResponseCodes.NOT_ENOUGH_CANCEL_DEDUCT_POINT;
+
 @Service
 @RequiredArgsConstructor
 public class DeductPointServiceImpl implements DeductPointService {
@@ -25,26 +28,29 @@ public class DeductPointServiceImpl implements DeductPointService {
     private final PointHistoryRepository pointHistoryRepository;
     private final DeductPointValidator deductPointValidator;
 
+    private final List<DomainCodes> availableEarnPointTypes = List.of(DomainCodes.POINT_DEDUCT_ST_PART, DomainCodes.POINT_DEDUCT_ST_AVAILABLE);
+    private final List<DomainCodes> restorableEarnPointTypes = List.of(DomainCodes.POINT_DEDUCT_ST_ALL, DomainCodes.POINT_DEDUCT_ST_PART);
+
     /**
      * 포인트 차감
      */
     @Transactional
     @Override
     public DeductPoint deduct(DeductPoint deductPoint) {
-        List<EarnPoint> availableEarnPoints = earnPointRepository.findAvailableEarnPoints(deductPoint.getUser().getUserId());
+        List<EarnPoint> availableEarnPoints = earnPointRepository.findAvailableEarnPoints(deductPoint.getUser().getUserId(), availableEarnPointTypes);
+        Long remainingDeductPoint = deductPoint.getDeductPoint();
 
-        Long tempDeductPoint = deductPoint.getDeductPoint();
         for (EarnPoint earnPoint : availableEarnPoints) {
-            if (tempDeductPoint == 0) {
+            if (remainingDeductPoint == 0) {
                 break;
             }
 
             // 포인트 만료일 한번 더 체크
             if (deductPointValidator.isExpired(earnPoint.getExpiredDate())) {
                 handleExpiredEarnPoint(earnPoint);
-                continue;
+            } else {
+                remainingDeductPoint = handleAvailableEarnPoint(earnPoint, remainingDeductPoint);
             }
-            tempDeductPoint = handleAvailableEarnPoint(earnPoint, tempDeductPoint);
         }
 
         return deductPointRepository.save(deductPoint);
@@ -57,64 +63,76 @@ public class DeductPointServiceImpl implements DeductPointService {
     @Override
     public void cancelDeduct(Long userId, Long cancelPoint) {
 
-        // 포인트 복구 가능한 earnPointList 조회
-        List<EarnPoint> restorableEarnPointList = earnPointRepository.findRestorableEarnPointList(userId);
+        List<EarnPoint> restorableEarnPointList = earnPointRepository.findRestorableEarnPointList(userId, restorableEarnPointTypes);
 
-        Long tempRestorePoint = cancelPoint;
+        if (restorableEarnPointList.isEmpty()) {
+            throw new CustomAccessDeniedException(NOT_ENOUGH_CANCEL_DEDUCT_POINT.getNumber(), NOT_ENOUGH_CANCEL_DEDUCT_POINT.getMessage());
+        }
+
+        Long remainingCancelPoint = cancelPoint; // 차감 취소시킬 포인트
         for (EarnPoint earnPoint : restorableEarnPointList) {
-            if (tempRestorePoint == 0) {
+            if (remainingCancelPoint == 0) {
                 break;
             }
-
-            tempRestorePoint = handleRestorableEarnPoint(earnPoint, tempRestorePoint);
+            remainingCancelPoint = handleRestorableEarnPoint(earnPoint, remainingCancelPoint);
         }
     }
 
     private void handleExpiredEarnPoint(EarnPoint earnPoint) {
-        userRepository.updateRemainPoint(earnPoint.getUser().getUserId(), earnPoint.getRemainPoint());
+        userRepository.updateRemainPointForExpiration(earnPoint.getUser().getUserId(), earnPoint.getRemainPoint());
         earnPointRepository.updateExpirationYn(earnPoint.getEarnPointId());
     }
 
-    private Long handleAvailableEarnPoint(EarnPoint earnPoint, Long tempDeductPoint) {
+    private Long handleAvailableEarnPoint(EarnPoint earnPoint, Long remainingDeductPoint) {
 
-        if (tempDeductPoint >= earnPoint.getRemainPoint()) {
+        if (earnPoint.getRemainPoint() > remainingDeductPoint) {
+            PointHistory pointHistory = PointHistory.of(earnPoint.getUser(), remainingDeductPoint, DomainCodes.POINT_DEDUCT);
+            earnPoint.getUser().addPointHistory(pointHistory);
+
+            pointHistoryRepository.save(pointHistory);
+            earnPointRepository.updateRemainPointForDeductPart(earnPoint.getEarnPointId(), remainingDeductPoint, DomainCodes.POINT_DEDUCT_ST_PART);
+            return 0L;
+        } else {
             PointHistory pointHistory = PointHistory.of(earnPoint.getUser(), earnPoint.getRemainPoint(), DomainCodes.POINT_DEDUCT);
             earnPoint.getUser().addPointHistory(pointHistory);
 
             pointHistoryRepository.save(pointHistory);
+            earnPointRepository.updateRemainPointForDeductAll(earnPoint.getEarnPointId(), DomainCodes.POINT_DEDUCT_ST_ALL);
 
-            return tempDeductPoint - earnPoint.getRemainPoint();
-        } else {
-            PointHistory pointHistory = PointHistory.of(earnPoint.getUser(), tempDeductPoint, DomainCodes.POINT_DEDUCT);
+            return remainingDeductPoint - earnPoint.getRemainPoint();
+        }
+    }
+
+    private Long handleRestorableEarnPoint(EarnPoint earnPoint, Long remainingCancelPoint) {
+
+        Long currCancelPoint = getCurrentCancelPoint(earnPoint, remainingCancelPoint);
+
+        if (remainingCancelPoint >= currCancelPoint) {
+            PointHistory pointHistory = PointHistory.of(earnPoint.getUser(), currCancelPoint, DomainCodes.POINT_DEDUCT_CANCEL);
             earnPoint.getUser().addPointHistory(pointHistory);
 
             pointHistoryRepository.save(pointHistory);
-            earnPointRepository.updateRemainPointForDeduct(earnPoint.getEarnPointId(), tempDeductPoint);
+            earnPointRepository.updateRemainPointAndDeductStatusForRestoration(earnPoint.getEarnPointId(), currCancelPoint, DomainCodes.POINT_DEDUCT_ST_AVAILABLE);
+
+            return remainingCancelPoint - currCancelPoint;
+        } else {
+            PointHistory pointHistory = PointHistory.of(earnPoint.getUser(), remainingCancelPoint, DomainCodes.POINT_DEDUCT_CANCEL);
+            earnPoint.getUser().addPointHistory(pointHistory);
+
+            pointHistoryRepository.save(pointHistory);
+
+            earnPointRepository.updateRemainPointAndDeductStatusForRestoration(earnPoint.getEarnPointId(), remainingCancelPoint, DomainCodes.POINT_DEDUCT_ST_PART);
+
             return 0L;
         }
     }
 
-    private Long handleRestorableEarnPoint(EarnPoint earnPoint, Long tempRestorePoint) {
-
-        Long restorePoint = earnPoint.getSavePoint();
-
-        if (tempRestorePoint >= restorePoint) {
-            PointHistory pointHistory = PointHistory.of(earnPoint.getUser(), restorePoint, DomainCodes.POINT_DEDUCT_CANCEL);
-            earnPoint.getUser().addPointHistory(pointHistory);
-
-            pointHistoryRepository.save(pointHistory);
-            earnPointRepository.updateRemainPointForRestoration(earnPoint.getEarnPointId(), restorePoint);
-
-            return tempRestorePoint - restorePoint;
-        } else {
-            PointHistory pointHistory = PointHistory.of(earnPoint.getUser(), tempRestorePoint, DomainCodes.POINT_DEDUCT_CANCEL);
-            earnPoint.getUser().addPointHistory(pointHistory);
-
-            pointHistoryRepository.save(pointHistory);
-            earnPointRepository.updateRemainPointForRestoration(earnPoint.getEarnPointId(), restorePoint - tempRestorePoint);
-
-            return 0L;
-        }
+    private Long getCurrentCancelPoint(EarnPoint earnPoint, Long remainingCancelPoint) {
+        return switch (earnPoint.getPointDeductStatus()) {
+            case POINT_DEDUCT_ST_ALL -> earnPoint.getSavePoint();
+            case POINT_DEDUCT_ST_PART -> earnPoint.getRemainPoint() + remainingCancelPoint == earnPoint.getSavePoint() ? remainingCancelPoint : 0L;
+            default -> 0L;
+        };
     }
 
 }

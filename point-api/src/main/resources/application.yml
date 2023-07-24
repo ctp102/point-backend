@@ -30,6 +30,11 @@ spring:
     host: localhost
     port: 6379
 
+redisson:
+  lock:
+    wait-time: 5000
+    lease-time: 2000
+
 logging:
   level:
     org.hibernate.SQL: debug
