@@ -22,6 +22,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @Tag(name = "UserPointRestController")
 @Slf4j
 @RestController
@@ -72,7 +74,7 @@ public class UserPointRestController {
             )
     })
     @PostMapping("/points/earn")
-    public CustomResponse earnPoint(@PathVariable("userId") final Long userId, @RequestBody final EarnPointRequest request) {
+    public CustomResponse earnPoint(@PathVariable("userId") final Long userId, @RequestBody @Valid final EarnPointRequest request) {
         pointRedissonFacade.earnPoint(userId, request);
         return new CustomResponse.Builder().build();
     }
@@ -87,7 +89,7 @@ public class UserPointRestController {
             )
     })
     @PostMapping("/points/deduct")
-    public CustomResponse deductPoint(@PathVariable("userId") final Long userId, @RequestBody final DeductPointRequest request) {
+    public CustomResponse deductPoint(@PathVariable("userId") final Long userId, @RequestBody @Valid final DeductPointRequest request) {
         pointRedissonFacade.deductPoint(userId, request);
         return new CustomResponse.Builder().build();
     }
@@ -102,7 +104,7 @@ public class UserPointRestController {
             )
     })
     @PostMapping("/points/cancel-deduct")
-    public CustomResponse cancelDeductPoint(@PathVariable("userId") final Long userId, @RequestBody final CancelDeductPointRequest request) {
+    public CustomResponse cancelDeductPoint(@PathVariable("userId") final Long userId, @RequestBody @Valid final CancelDeductPointRequest request) {
         pointRedissonFacade.cancelDeductPoint(userId, request);
         return new CustomResponse.Builder().build();
     }

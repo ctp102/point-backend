@@ -5,6 +5,7 @@ import com.point.core.common.exception.*;
 import com.point.core.common.response.CustomResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -14,6 +15,13 @@ import javax.servlet.http.HttpServletRequest;
 @Slf4j
 @RestControllerAdvice(basePackages = "com.point.api")
 public class CustomExceptionHandler {
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(BindException.class)
+    public CustomResponse bindException(BindException e) {
+        log.error("[BindException 발생] {}", e.getBindingResult().getAllErrors().get(0).getDefaultMessage(), e);
+        return getCustomResponse(e);
+    }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(CustomBadRequestException.class)
@@ -55,6 +63,11 @@ public class CustomExceptionHandler {
     public CustomResponse exception(HttpServletRequest request, CustomException e) {
         log.error("[Exception 발생] Request URI: {}", request.getRequestURI(), e);
         return new CustomResponse.Builder(ErrorResponseCodes.INTERNAL_SERVER_ERROR).build();
+    }
+
+    private CustomResponse getCustomResponse(BindException e) {
+        ErrorResponseCodes errorCodes = ErrorResponseCodes.findByMessage(e.getBindingResult().getAllErrors().get(0).getDefaultMessage());
+        return new CustomResponse.Builder(errorCodes).build();
     }
 
     private CustomResponse getCustomResponse(Exception e) {
