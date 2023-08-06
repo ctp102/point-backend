@@ -1,7 +1,6 @@
 package com.point.api.controller;
 
 import com.point.core.common.facade.PointFacade;
-import com.point.core.common.facade.PointRedissonFacade;
 import com.point.core.common.response.CustomResponse;
 import com.point.core.deduct.dto.CancelDeductPointRequest;
 import com.point.core.deduct.dto.DeductPointRequest;
@@ -33,7 +32,7 @@ import javax.validation.Valid;
 public class UserPointRestController {
 
     private final PointFacade pointFacade;
-    private final PointRedissonFacade pointRedissonFacade;
+//    private final PointRedissonFacade pointRedissonFacade;
 
     @Operation(summary = "회원별 잔여 포인트 조회")
     @ApiResponse(responseCode = "200", description = "API 요청 성공", content = {
