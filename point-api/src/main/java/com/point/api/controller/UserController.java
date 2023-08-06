@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "UserRestController")
 @RestController
 @RequiredArgsConstructor
-public class UserRestController {
+public class UserController {
 
     private final UserRepository userRepository;
     private final PointFacade pointFacade;

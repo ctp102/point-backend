@@ -22,7 +22,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     @Override
     public User findUser(Long userId) {
-        User user = userRepository.findById(userId).orElse(null);
+        User user = userRepository.findByUserId(userId).orElse(null);
 
         if (Objects.isNull(user)) {
             log.error("[findUser] 사용자를 찾을 수 없습니다. userId: {}", userId);

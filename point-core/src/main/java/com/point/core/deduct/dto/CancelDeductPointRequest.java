@@ -1,9 +1,6 @@
 package com.point.core.deduct.dto;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.validation.constraints.Positive;
 
@@ -15,8 +12,15 @@ public class CancelDeductPointRequest {
     @Positive(message = "차감 취소 포인트는 0보다 커야 합니다.")
     private Long cancelPoint;
 
-    public CancelDeductPointRequest(Long cancelPoint) {
+    @Builder
+    private CancelDeductPointRequest(Long cancelPoint) {
         this.cancelPoint = cancelPoint;
+    }
+
+    public static CancelDeductPointRequest of(Long cancelPoint) {
+        return CancelDeductPointRequest.builder()
+                .cancelPoint(cancelPoint)
+                .build();
     }
 
 }

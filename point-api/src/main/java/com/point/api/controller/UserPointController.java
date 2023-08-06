@@ -29,7 +29,7 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/api/v1/users/{userId}")
 @RequiredArgsConstructor
-public class UserPointRestController {
+public class UserPointController {
 
     private final PointFacade pointFacade;
 //    private final PointRedissonFacade pointRedissonFacade;
