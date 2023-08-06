@@ -22,7 +22,7 @@ public class Paging {
     }
 
     @Builder
-    public Paging(int pageNo, int pageSize, long totalElements, long totalPage, Sort sort) {
+    private Paging(int pageNo, int pageSize, long totalElements, long totalPage, Sort sort) {
         this.pageNo = pageNo;
         this.pageSize = pageSize;
         this.totalElements = totalElements;

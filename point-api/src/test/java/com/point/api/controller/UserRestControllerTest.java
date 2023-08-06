@@ -33,11 +33,9 @@ public class UserRestControllerTest {
     void saveUserTest() throws Exception {
         Long savePoint = 10_000L;
 
-        EarnPointRequest earnPointRequest = new EarnPointRequest(savePoint);
+        EarnPointRequest earnPointRequest = EarnPointRequest.of(savePoint);
 
-        String uri = "/api/v1/users";
-
-        mockMvc.perform(post(uri)
+        mockMvc.perform(post("/api/v1/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(earnPointRequest)))
                 .andDo(print())

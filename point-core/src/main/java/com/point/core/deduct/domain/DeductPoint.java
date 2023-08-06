@@ -28,7 +28,7 @@ public class DeductPoint extends BaseTimeEntity {
     private Long deductPoint;
 
     @Builder
-    public DeductPoint(User user, Long deductPoint) {
+    private DeductPoint(User user, Long deductPoint) {
         this.user = user;
         this.deductPoint = deductPoint;
     }

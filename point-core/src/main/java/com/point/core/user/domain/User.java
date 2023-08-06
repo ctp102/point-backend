@@ -72,7 +72,7 @@ public class User extends BaseTimeEntity {
     }
 
     @Builder
-    public User(Long userId, Long remainPoint) {
+    private User(Long userId, Long remainPoint) {
         this.userId = userId;
         this.remainPoint = remainPoint;
     }

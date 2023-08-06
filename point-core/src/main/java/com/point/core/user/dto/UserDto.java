@@ -10,7 +10,7 @@ public class UserDto {
     private final Long remainPoint;
 
     @Builder
-    public UserDto(Long userId, Long remainPoint) {
+    private UserDto(Long userId, Long remainPoint) {
         this.userId = userId;
         this.remainPoint = remainPoint;
     }

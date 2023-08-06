@@ -21,7 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class UserPointRestControllerTest {
+public class UserPointMockRestControllerTest {
 
     @Autowired
     private MockMvc mockMvc;

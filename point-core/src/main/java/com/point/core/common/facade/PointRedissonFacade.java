@@ -19,6 +19,7 @@ import static com.point.core.common.enums.ErrorResponseCodes.LOCK_TRY_TIMEOUT;
 
 @Component
 @Slf4j
+@Deprecated
 public class PointRedissonFacade {
 
     private final RedissonClient redissonClient;

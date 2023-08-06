@@ -19,7 +19,7 @@ public class PointHistoryDto {
     private LocalDateTime createdDate;
 
     @Builder
-    public PointHistoryDto(Long userId, Long pointHistoryId, Long point, DomainCodes pointActionType, LocalDateTime createdDate) {
+    private PointHistoryDto(Long userId, Long pointHistoryId, Long point, DomainCodes pointActionType, LocalDateTime createdDate) {
         this.userId = userId;
         this.pointHistoryId = pointHistoryId;
         this.point = point;

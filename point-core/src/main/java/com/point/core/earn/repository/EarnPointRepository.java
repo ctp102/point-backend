@@ -50,12 +50,12 @@ public interface EarnPointRepository extends JpaRepository<EarnPoint, Long> {
 
     @Modifying
     @Query("UPDATE EarnPoint ep " +
-            "SET ep.remainPoint = (ep.remainPoint - :tempDeductPoint), " +
+            "SET ep.remainPoint = (ep.remainPoint - :remainingDeductPoint), " +
             "    ep.pointDeductStatus = :pointDeductStatus " +
             "WHERE ep.earnPointId = :earnPointId")
     void updateRemainPointForDeductPart(
             @Param("earnPointId") Long earnPointId,
-            @Param("tempDeductPoint") long tempDeductPoint,
+            @Param("remainingDeductPoint") long remainingDeductPoint,
             @Param("pointDeductStatus") DomainCodes pointDeductStatus
     );
 

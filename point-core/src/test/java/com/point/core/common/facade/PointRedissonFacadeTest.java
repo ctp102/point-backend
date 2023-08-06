@@ -25,7 +25,7 @@ public class PointRedissonFacadeTest {
         Long defaultPoint = 10_000L;
         Long savePoint = 5_000L; // 적립할 포인트
 
-        EarnPointRequest request = new EarnPointRequest(savePoint);
+        EarnPointRequest request = EarnPointRequest.of(savePoint);
         pointRedissonFacade.earnPoint(userId, request);
 
         User foundUser = userService.findUser(userId);

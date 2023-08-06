@@ -5,6 +5,7 @@ import com.point.core.common.facade.PointRedissonFacade;
 import com.point.core.common.response.CustomResponse;
 import com.point.core.deduct.dto.CancelDeductPointRequest;
 import com.point.core.deduct.dto.DeductPointRequest;
+import com.point.core.earn.domain.EarnPoint;
 import com.point.core.earn.dto.EarnPointRequest;
 import com.point.core.history.dto.PointHistoryDto;
 import com.point.core.history.form.PointHistoryForm;
@@ -75,8 +76,8 @@ public class UserPointRestController {
     })
     @PostMapping("/points/earn")
     public CustomResponse earnPoint(@PathVariable("userId") final Long userId, @RequestBody @Valid final EarnPointRequest request) {
-        pointRedissonFacade.earnPoint(userId, request);
-        return new CustomResponse.Builder().build();
+        EarnPoint earnPoint = pointFacade.earnPoint(userId, request);
+        return new CustomResponse.Builder().addData("earnPointId", earnPoint.getEarnPointId()).build();
     }
 
     @Operation(summary = "회원별 포인트 차감")
@@ -90,7 +91,7 @@ public class UserPointRestController {
     })
     @PostMapping("/points/deduct")
     public CustomResponse deductPoint(@PathVariable("userId") final Long userId, @RequestBody @Valid final DeductPointRequest request) {
-        pointRedissonFacade.deductPoint(userId, request);
+        pointFacade.deductPoint(userId, request);
         return new CustomResponse.Builder().build();
     }
 
@@ -105,7 +106,7 @@ public class UserPointRestController {
     })
     @PostMapping("/points/cancel-deduct")
     public CustomResponse cancelDeductPoint(@PathVariable("userId") final Long userId, @RequestBody @Valid final CancelDeductPointRequest request) {
-        pointRedissonFacade.cancelDeductPoint(userId, request);
+        pointFacade.cancelDeductPoint(userId, request);
         return new CustomResponse.Builder().build();
     }
 

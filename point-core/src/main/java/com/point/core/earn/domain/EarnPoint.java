@@ -51,7 +51,7 @@ public class EarnPoint extends BaseTimeEntity {
     private LocalDateTime expiredDate;
 
     @Builder
-    public EarnPoint(User user, Long savePoint, Long remainPoint, DomainCodes pointDeductStatus, String expirationYn, LocalDateTime expiredDate) {
+    private EarnPoint(User user, Long savePoint, Long remainPoint, DomainCodes pointDeductStatus, String expirationYn, LocalDateTime expiredDate) {
         this.user = user;
         this.savePoint = savePoint;
         this.remainPoint = remainPoint;

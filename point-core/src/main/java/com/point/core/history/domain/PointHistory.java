@@ -33,7 +33,7 @@ public class PointHistory extends BaseTimeEntity {
     private DomainCodes pointActionType;
 
     @Builder
-    public PointHistory(User user, Long point, DomainCodes pointActionType) {
+    private PointHistory(User user, Long point, DomainCodes pointActionType) {
         this.user = user;
         this.point = point;
         this.pointActionType = pointActionType;
